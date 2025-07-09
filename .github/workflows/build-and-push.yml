@@ -5,7 +5,6 @@ on:
   repository_dispatch:
     types: [caddy-release, bouncer-release]
 
-  # Run automatically on a schedule
   schedule:
     - cron: '0 3 * * *'
 
@@ -32,6 +31,9 @@ jobs:
           CADDY_VERSION=$(curl -s "https://api.github.com/repos/caddyserver/caddy/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' | sed 's/v//')
           echo "CADDY_VERSION=${CADDY_VERSION}" >> $GITHUB_OUTPUT
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -55,16 +57,15 @@ jobs:
           context: .
           file: ./caddy.Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/${{ github.repository_owner }}/cs-caddy:${{ steps.get_caddy_version.outputs.CADDY_VERSION }}
             ghcr.io/${{ github.repository_owner }}/cs-caddy:latest
             iamdockin/cs-caddy:${{ steps.get_caddy_version.outputs.CADDY_VERSION }}
             iamdockin/cs-caddy:latest
-          platforms: linux/amd64,linux/arm64
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cs-caddy:latest
           cache-to: type=inline
 
-      # This step triggers the `repository_dispatch` event for other workflows.
       - name: Dispatch build completion event
         uses: peter-evans/repository-dispatch@v3
         with:
