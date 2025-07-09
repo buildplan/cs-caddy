@@ -1,13 +1,13 @@
-name: Build and Push CS-Caddy to GHCR
+name: Build and Push CS-Caddy to GHCR and Docker Hub
 
 on:
-  # Trigger the workflow when a new release is published on the official Caddy repository.
+  # Trigger the workflow when a new release is published on the official Caddy repository or new bouncer verion.
   repository_dispatch:
     types: [caddy-release, bouncer-release]
 
-  # Run automatically on a schedule (weekly check as a fallback)
+  # Run automatically on a schedule
   schedule:
-    - cron: '0 3 * * 0'
+    - cron: '0 3 * * *' # Runs daily at 3 AM UTC
 
   # Allow running this workflow manually from the Actions tab
   workflow_dispatch:
@@ -45,6 +45,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@v5
@@ -55,6 +61,8 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/cs-caddy:${{ steps.get_caddy_version.outputs.CADDY_VERSION }}
             ghcr.io/${{ github.repository_owner }}/cs-caddy:latest
+            iamdockin/cs-caddy:${{ steps.get_caddy_version.outputs.CADDY_VERSION }}
+            iamdockin/cs-caddy:latest
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cs-caddy:latest
           cache-to: type=inline
 
