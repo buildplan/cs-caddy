@@ -1,6 +1,6 @@
-# cs-caddy
-caddy with crowdsec
+## cs-caddy
+### caddy with crowdsec
 
-Download cadd.Dockerfile and run:
+Download caddy.Dockerfile and run:
 
 `docker build -t yourusername/custom-caddy:latest -f caddy.Dockerfile .`
