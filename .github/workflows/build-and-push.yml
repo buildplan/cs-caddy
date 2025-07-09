@@ -1,19 +1,25 @@
-name: Build and Push CrowdSec Caddy to GHCR
+name: Build and Push CS-Caddy to GHCR
 
 on:
+  # Trigger the workflow when a new release is published on the official Caddy repository.
   repository_dispatch:
     types: [caddy-release]
 
   # Run automatically on a schedule (weekly check as a fallback)
   schedule:
     - cron: '0 3 * * 0'
+
+  # Allow running this workflow manually from the Actions tab
   workflow_dispatch:
+
+  # Run when you push changes to the main branch
   push:
     branches:
       - 'main'
 
+# Set permissions for the GITHUB_TOKEN.
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -52,6 +58,7 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cs-caddy:latest
           cache-to: type=inline
 
+      # This step triggers the `repository_dispatch` event for other workflows.
       - name: Dispatch build completion event
         uses: peter-evans/repository-dispatch@v3
         with:
