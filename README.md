@@ -6,7 +6,7 @@ Download caddy.Dockerfile and run:
 
 `docker build -t yourusername/custom-caddy:latest -f caddy.Dockerfile .`
 
-or pull the image - auto-updates from new [caddy releses](https://github.com/caddyserver/caddy/releases)
+or pull the image - auto-updates from new [caddy releses](https://github.com/caddyserver/caddy/releases) and also on new update to [caddy-crowdsec-bouncer](https://github.com/hslatman/caddy-crowdsec-bouncer)
 
 `docker pull ghcr.io/buildplan/cs-caddy:latest`
 
