@@ -2,7 +2,6 @@ name: Check for New Bouncer Release
 
 on:
   schedule:
-    # Run every 24 hours to check for a new release.
     - cron: '0 3 * * *'
   workflow_dispatch:
 
@@ -10,7 +9,7 @@ jobs:
   check-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required to dispatch an event
+      contents: write
     steps:
       - name: Get latest bouncer release tag
         id: get_tag
@@ -22,14 +21,11 @@ jobs:
         id: check
         uses: actions/cache@v4
         with:
-          path: .cache/bouncer-tag # a dummy path to cache
+          path: .cache/bouncer-tag
           key: bouncer-release-${{ steps.get_tag.outputs.LATEST_TAG }}
 
       - name: Trigger build workflow if new release found
-        # This step only runs if the cache key was new (i.e., cache-hit is not 'true').
         if: steps.check.outputs.cache-hit != 'true'
         uses: peter-evans/repository-dispatch@v3
         with:
-          # This sends a 'bouncer-release' event to our repo,
-          # which the main build workflow can listen for.
           event-type: bouncer-release
