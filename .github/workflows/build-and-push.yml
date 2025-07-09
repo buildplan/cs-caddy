@@ -4,6 +4,7 @@ on:
   # Trigger the workflow when a new release is published on the official Caddy repository.
   repository_dispatch:
     types: [caddy-release]
+    types: [caddy-release, bouncer-release]
 
   # Run automatically on a schedule (weekly check as a fallback)
   schedule:
