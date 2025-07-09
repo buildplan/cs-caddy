@@ -7,17 +7,14 @@ on:
 
   # Run automatically on a schedule
   schedule:
-    - cron: '0 3 * * *' # Runs daily at 3 AM UTC
+    - cron: '0 3 * * *'
 
-  # Allow running this workflow manually from the Actions tab
   workflow_dispatch:
 
-  # Run when you push changes to the main branch
   push:
     branches:
       - 'main'
 
-# Set permissions for the GITHUB_TOKEN.
 permissions:
   contents: write
   packages: write
