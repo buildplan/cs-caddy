@@ -1,0 +1,60 @@
+name: Build and Push CrowdSec Caddy to GHCR
+
+on:
+  repository_dispatch:
+    types: [caddy-release]
+
+  # Run automatically on a schedule (weekly check as a fallback)
+  schedule:
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Latest Caddy Version Tag
+        id: get_caddy_version
+        run: |
+          CADDY_VERSION=$(curl -s "https://api.github.com/repos/caddyserver/caddy/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' | sed 's/v//')
+          echo "CADDY_VERSION=${CADDY_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./caddy.Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/cs-caddy:${{ steps.get_caddy_version.outputs.CADDY_VERSION }}
+            ghcr.io/${{ github.repository_owner }}/cs-caddy:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cs-caddy:latest
+          cache-to: type=inline
+
+      - name: Dispatch build completion event
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: caddy-image-built
+          client-payload: '{"image_tag": "${{ steps.get_caddy_version.outputs.CADDY_VERSION }}"}'
