@@ -40,6 +40,3 @@ FROM caddy:latest
 
 # Copy CS-Caddy binary from the builder stage,
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
-
-# Built-in Healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD caddy admin health
