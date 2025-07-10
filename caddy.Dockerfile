@@ -3,7 +3,7 @@ FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-# Create a main.go file that imports Caddy and all the desired plugins.
+# Create a main.go file that imports Caddy and all the desired plugins
 RUN tee main.go <<EOF
 package main
 
@@ -25,19 +25,21 @@ func main() {
 }
 EOF
 
-# Initialize a Go module and download all the necessary dependencies.
+# Initialize a Go module and download all the necessary dependencies
 RUN go mod init custom-caddy
 RUN go mod tidy
 
-# Build the custom Caddy binary.
+# Build CS-Caddy binary
 RUN CGO_ENABLED=0 GOOS=linux go build \
     -o /usr/bin/caddy \
     -ldflags "-w -s" .
 
-# ---
 
 # Stage 2: The final image
 FROM caddy:latest
 
-# Copy our custom-built Caddy binary from the builder stage,
+# Install wget for the healthcheck
+RUN apk add --no-cache wget
+
+# Copy CS-Caddy binary from the builder stage,
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
