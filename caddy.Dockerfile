@@ -38,8 +38,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
 # Stage 2: The final image
 FROM caddy:latest
 
-# Install wget for the healthcheck
-RUN apk add --no-cache wget
-
 # Copy CS-Caddy binary from the builder stage,
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+
+# Add Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD caddy admin health
