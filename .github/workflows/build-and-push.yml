@@ -3,8 +3,6 @@ name: Build and Push CS-Caddy to GHCR and Docker Hub
 on:
   repository_dispatch:
     types: [caddy-release, bouncer-release]
-  schedule:
-    - cron: '0 3 * * *'
   workflow_dispatch:
   push:
     branches:
