@@ -1,4 +1,4 @@
-name: Build and Push CS-Caddy to GHCR and Docker Hub
+name: Build and Push cs-caddy to GHCR and Docker Hub
 
 on:
   repository_dispatch:
