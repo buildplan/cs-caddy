@@ -1,5 +1,10 @@
 # cs-caddy
 
+[![Build and Push CS-Caddy](https://github.com/buildplan/cs-caddy/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/build-and-push.yml)
+[![Check Caddy Release](https://github.com/buildplan/cs-caddy/actions/workflows/check-caddy-release.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/check-caddy-release.yml)
+[![Check Bouncer Release](https://github.com/buildplan/cs-caddy/actions/workflows/check-bouncer-release.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/check-bouncer-release.yml)
+
+
 A custom Docker image for the Caddy web server that includes the CrowdSec bouncer for IP blocking and a Web Application Firewall (WAF).
 
 This makes it easy to add two layers of security directly into your web server. It's based on the excellent [caddy-crowdsec-bouncer](https://github.com/hslatman/caddy-crowdsec-bouncer) by hslatman.
