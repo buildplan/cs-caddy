@@ -1,7 +1,7 @@
 name: Build and Push CS-Caddy to GHCR and Docker Hub
 
 on:
-  # This workflow is now ONLY triggered by events, not its own schedule.
+  # triggered by events, not its own schedule.
   repository_dispatch:
     types: [caddy-release, bouncer-release]
 
@@ -20,18 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: cs-caddy
-      # Add GH_TOKEN to the environment for the 'gh' command to use for authentication.
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- START: Updated Version Fetching ---
       - name: Fetch Latest Caddy Version
         id: caddy
         run: |
-          # Use the authenticated 'gh' CLI to avoid rate limits.
           CADDY_VERSION=$(gh api /repos/caddyserver/caddy/releases/latest --jq .tag_name | sed 's/^v//')
           echo "CADDY_VERSION=${CADDY_VERSION}" >> $GITHUB_ENV
           echo "caddy_version=${CADDY_VERSION}" >> $GITHUB_OUTPUT
@@ -39,11 +36,9 @@ jobs:
       - name: Fetch Latest Bouncer Version
         id: bouncer
         run: |
-          # Use the authenticated 'gh' CLI to avoid rate limits.
           BOUNCER_VERSION=$(gh api /repos/hslatman/caddy-crowdsec-bouncer/releases/latest --jq .tag_name | sed 's/^v//')
           echo "BOUNCER_VERSION=${BOUNCER_VERSION}" >> $GITHUB_ENV
           echo "bouncer_version=${BOUNCER_VERSION}" >> $GITHUB_OUTPUT
-      # --- END: Updated Version Fetching ---
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -106,3 +101,13 @@ jobs:
             - Image: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.CADDY_VERSION }}-bouncer-${{ env.BOUNCER_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up old GHCR images
+        uses: quartx-analytics/ghcr-cleaner@v1
+        with:
+          owner-type: user
+          token: ${{ secrets.PAT_TOKEN }}
+          repository_owner: ${{ github.repository_owner }}
+          repository-name: cs-caddy
+          delete-untagged: true
+          keep-at-most: 5
