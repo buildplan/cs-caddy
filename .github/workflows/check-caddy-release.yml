@@ -14,8 +14,10 @@ jobs:
       - name: Get latest Caddy release tag
         id: get_tag
         run: |
-          LATEST_TAG=$(curl -s "https://api.github.com/repos/caddyserver/caddy/releases/latest" | jq -r .tag_name)
+          LATEST_TAG=$(gh api /repos/caddyserver/caddy/releases/latest --jq .tag_name)
           echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check if release tag is new by using it as a cache key
         id: check

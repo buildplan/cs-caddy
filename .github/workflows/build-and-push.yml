@@ -1,9 +1,12 @@
-name: Build and Push cs-caddy to GHCR and Docker Hub
+name: Build and Push CS-Caddy to GHCR and Docker Hub
 
 on:
+  # This workflow is now ONLY triggered by events, not its own schedule.
   repository_dispatch:
     types: [caddy-release, bouncer-release]
+
   workflow_dispatch:
+
   push:
     branches:
       - 'main'
@@ -17,24 +20,30 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: cs-caddy
+      # Add GH_TOKEN to the environment for the 'gh' command to use for authentication.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # --- START: Updated Version Fetching ---
       - name: Fetch Latest Caddy Version
         id: caddy
         run: |
-          CADDY_VERSION=$(curl -s https://api.github.com/repos/caddyserver/caddy/releases/latest | jq -r .tag_name | sed 's/^v//')
+          # Use the authenticated 'gh' CLI to avoid rate limits.
+          CADDY_VERSION=$(gh api /repos/caddyserver/caddy/releases/latest --jq .tag_name | sed 's/^v//')
           echo "CADDY_VERSION=${CADDY_VERSION}" >> $GITHUB_ENV
           echo "caddy_version=${CADDY_VERSION}" >> $GITHUB_OUTPUT
 
       - name: Fetch Latest Bouncer Version
         id: bouncer
         run: |
-          BOUNCER_VERSION=$(curl -s https://api.github.com/repos/hslatman/caddy-crowdsec-bouncer/releases/latest | jq -r .tag_name | sed 's/^v//')
+          # Use the authenticated 'gh' CLI to avoid rate limits.
+          BOUNCER_VERSION=$(gh api /repos/hslatman/caddy-crowdsec-bouncer/releases/latest --jq .tag_name | sed 's/^v//')
           echo "BOUNCER_VERSION=${BOUNCER_VERSION}" >> $GITHUB_ENV
           echo "bouncer_version=${BOUNCER_VERSION}" >> $GITHUB_OUTPUT
+      # --- END: Updated Version Fetching ---
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

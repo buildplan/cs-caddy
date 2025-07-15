@@ -10,11 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Get latest bouncer release tag
         id: get_tag
         run: |
-          LATEST_TAG=$(curl -s "https://api.github.com/repos/hslatman/caddy-crowdsec-bouncer/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+          LATEST_TAG=$(gh api /repos/hslatman/caddy-crowdsec-bouncer/releases/latest --jq .tag_name)
           echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_OUTPUT
 
       - name: Check if release tag is new by using it as a cache key
