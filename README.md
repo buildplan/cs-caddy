@@ -1,6 +1,6 @@
 # cs-caddy
 
-[![Build and Push cs-caddy](https://github.com/buildplan/cs-caddy/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/build-and-push.yml)
+[![Build and Push CS-Caddy](https://github.com/buildplan/cs-caddy/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/build-and-push.yml)
 [![Check Caddy Release](https://github.com/buildplan/cs-caddy/actions/workflows/check-caddy-release.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/check-caddy-release.yml)
 [![Check Bouncer Release](https://github.com/buildplan/cs-caddy/actions/workflows/check-bouncer-release.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/check-bouncer-release.yml)
 
