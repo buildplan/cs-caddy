@@ -110,4 +110,4 @@ jobs:
           repository-owner: ${{ github.repository_owner }}
           repository-name: cs-caddy
           delete-untagged: true
-          keep-at-most: 3
+          keep-at-most: 5
