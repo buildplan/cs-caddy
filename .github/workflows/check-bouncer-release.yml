@@ -27,7 +27,7 @@ jobs:
           key: bouncer-release-${{ steps.get_tag.outputs.LATEST_TAG }}
 
       - name: Trigger build workflow if new release found
-        if: steps.check.outputs.cache-hit != 'true'
+        if: steps.check.outputs.cache-hit != true
         uses: peter-evans/repository-dispatch@v3
         with:
           event-type: bouncer-release
