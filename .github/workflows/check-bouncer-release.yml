@@ -19,6 +19,11 @@ jobs:
           LATEST_TAG=$(gh api /repos/hslatman/caddy-crowdsec-bouncer/releases/latest --jq .tag_name)
           echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_OUTPUT
 
+      - name: Prepare cache directory
+        run: |
+          mkdir -p .cache
+          echo "${{ steps.get_tag.outputs.LATEST_TAG }}" > .cache/bouncer-tag
+
       - name: Check if release tag is new by using it as a cache key
         id: check
         uses: actions/cache@v4
@@ -26,8 +31,14 @@ jobs:
           path: .cache/bouncer-tag
           key: bouncer-release-${{ steps.get_tag.outputs.LATEST_TAG }}
 
+      - name: Persist current tag for next run
+        if: steps.check.outputs.cache-hit != 'true'
+        run: |
+          echo "${{ steps.get_tag.outputs.LATEST_TAG }}" > .cache/bouncer-tag
+
       - name: Trigger build workflow if new release found
-        if: steps.check.outputs.cache-hit != true
+        if: steps.check.outputs.cache-hit != 'true'
         uses: peter-evans/repository-dispatch@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           event-type: bouncer-release
