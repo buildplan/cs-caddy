@@ -10,6 +10,9 @@ on:
   push:
     branches:
       - 'main'
+    paths:
+      - '.github/workflows/build-and-push.yml'
+      - 'caddy.Dockerfile'
 
 permissions:
   contents: write
