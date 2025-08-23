@@ -33,7 +33,7 @@ jobs:
           echo "${{ steps.get_tag.outputs.LATEST_TAG }}" > .cache/bouncer-tag
 
       - name: Trigger build workflow if new release found
-        if: steps.check.outputs.cache-hit != 'true'
+        if: steps.check.outputs.cache-hit != true
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
