@@ -26,15 +26,8 @@ jobs:
           path: .cache/caddy-tag
           key: caddy-release-${{ steps.get_tag.outputs.LATEST_TAG }}
 
-      - name: Persist current tag for next run
-        if: steps.check.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p .cache
-          echo "${{ steps.get_tag.outputs.LATEST_TAG }}" > .cache/caddy-tag
-
       - name: Trigger build workflow if new release found
-        if: steps.check.outputs.cache-hit != 'true'
+        if: steps.check.outputs.cache-hit != true
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           event-type: caddy-release
