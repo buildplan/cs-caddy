@@ -27,7 +27,7 @@ jobs:
           key: bouncer-release-${{ steps.get_tag.outputs.LATEST_TAG }}
 
       - name: Persist current tag for next run
-        if: steps.check.outputs.cache-hit != 'true'
+        if: steps.check.outputs.cache-hit != true
         run: |
           mkdir -p .cache
           echo "${{ steps.get_tag.outputs.LATEST_TAG }}" > .cache/bouncer-tag
