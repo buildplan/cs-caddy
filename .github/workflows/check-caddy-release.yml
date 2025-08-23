@@ -19,11 +19,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare cache directory
-        run: |
-          mkdir -p .cache
-          echo "${{ steps.get_tag.outputs.LATEST_TAG }}" > .cache/caddy-tag
-
       - name: Check if release tag is new by using it as a cache key
         id: check
         uses: actions/cache@v4
@@ -34,6 +29,7 @@ jobs:
       - name: Persist current tag for next run
         if: steps.check.outputs.cache-hit != 'true'
         run: |
+          mkdir -p .cache
           echo "${{ steps.get_tag.outputs.LATEST_TAG }}" > .cache/caddy-tag
 
       - name: Trigger build workflow if new release found
