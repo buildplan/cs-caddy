@@ -11,6 +11,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Get latest Caddy release tag
         id: get_tag
         run: |
@@ -23,17 +26,17 @@ jobs:
         id: check
         uses: actions/cache@v4
         with:
-          path: .cache/caddy-tag
+          path: .cache
           key: caddy-release-${{ steps.get_tag.outputs.LATEST_TAG }}
 
-      - name: Persist current tag for next run
-        if: steps.check.outputs.cache-hit != true
+      - name: Create cache marker if new release
+        if: steps.check.outputs.cache-hit != 'true'
         run: |
           mkdir -p .cache
           echo "${{ steps.get_tag.outputs.LATEST_TAG }}" > .cache/caddy-tag
 
       - name: Trigger build workflow if new release found
-        if: steps.check.outputs.cache-hit != true
+        if: steps.check.outputs.cache-hit != 'true'
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
