@@ -41,8 +41,3 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           event-type: bouncer-release
-
-      - name: Clean old caches
-        if: steps.check.outputs.cache-hit != 'true'
-        run: |
-          gh api --method DELETE /repos/${{ github.repository }}/actions/caches?key=bouncer-release-old-version
