@@ -45,4 +45,4 @@ jobs:
       - name: Clean old caches
         if: steps.check.outputs.cache-hit != 'true'
         run: |
-          gh api --method DELETE /repos/${{ github.repository }}/actions/caches?key=caddy-release-old-version
+          gh api --method DELETE /repos/${{ github.repository }}/actions/caches?key=bouncer-release-old-version
