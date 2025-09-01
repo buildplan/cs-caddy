@@ -1,4 +1,4 @@
-# cs-caddy
+# cs-caddy [![Built with xcaddy](https://img.shields.io/badge/Built%20with-xcaddy-00ADD8?style=flat&logo=go&logoColor=white)](https://github.com/caddyserver/xcaddy) [![CrowdSec Bouncer](https://img.shields.io/badge/CrowdSec-Bouncer-orange?style=flat&logo=shield&logoColor=white)](https://github.com/hslatman/caddy-crowdsec-bouncer)
 
 [![Build and Push CS-Caddy](https://github.com/buildplan/cs-caddy/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/build-and-push.yml)
 [![Check Caddy Release](https://github.com/buildplan/cs-caddy/actions/workflows/check-caddy-release.yml/badge.svg)](https://github.com/buildplan/cs-caddy/actions/workflows/check-caddy-release.yml)
