@@ -37,6 +37,6 @@ FROM caddy:latest
 # Copy CS-Caddy binary from the builder stage
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
-LABEL org.opencontainers.image.title="Caddy with CrowdSec" \
+LABEL org.opencontainers.image.title="cs-caddy" \
       org.opencontainers.image.description="Custom Caddy build with CrowdSec bouncer modules" \
-      org.opencontainers.image.source="https://github.com/your/repo"
+      org.opencontainers.image.source="https://github.com/buildplan/cs-caddy"
