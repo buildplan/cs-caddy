@@ -24,6 +24,7 @@ jobs:
     env:
       IMAGE_NAME: cs-caddy
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DEFAULT_GO_VERSION: 1.25
 
     steps:
       - name: Checkout repository
@@ -32,7 +33,9 @@ jobs:
       - name: Fetch Latest Caddy Version
         id: caddy
         run: |
-          CADDY_VERSION=$(gh api /repos/caddyserver/caddy/releases/latest --jq .tag_name | sed 's/^v//')
+          CADDY_TAG=$(gh api /repos/caddyserver/caddy/releases/latest --jq .tag_name)
+          CADDY_VERSION=$(echo "${CADDY_TAG}" | sed 's/^v//')
+          echo "CADDY_TAG=${CADDY_TAG}" >> $GITHUB_ENV
           echo "CADDY_VERSION=${CADDY_VERSION}" >> $GITHUB_ENV
           echo "caddy_version=${CADDY_VERSION}" >> $GITHUB_OUTPUT
 
@@ -42,6 +45,27 @@ jobs:
           BOUNCER_VERSION=$(gh api /repos/hslatman/caddy-crowdsec-bouncer/releases/latest --jq .tag_name | sed 's/^v//')
           echo "BOUNCER_VERSION=${BOUNCER_VERSION}" >> $GITHUB_ENV
           echo "bouncer_version=${BOUNCER_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Fetch Required Go Version from Caddy's go.mod
+        id: go_version
+        run: |
+          GO_VERSION_URL="https://raw.githubusercontent.com/caddyserver/caddy/${{ env.CADDY_TAG }}/go.mod"
+          echo "Attempting to fetch Go version from: ${GO_VERSION_URL}"
+          
+          # Use curl to fetch, grep to find the line 'go X.YY', awk to get the version
+          # The '|| true' ensures the step doesn't fail if curl, grep, or awk fails
+          DYNAMIC_GO_VERSION=$(curl -sL --fail "${GO_VERSION_URL}" | grep -E "^go [0-9]+\.[0-9]+" | awk '{print $2}' || true)
+          
+          if [[ -n "${DYNAMIC_GO_VERSION}" ]]; then
+            echo "Successfully found dynamic Go version: ${DYNAMIC_GO_VERSION}"
+            echo "GO_VERSION=${DYNAMIC_GO_VERSION}" >> $GITHUB_ENV
+            echo "go_version=${DYNAMIC_GO_VERSION}" >> $GITHUB_OUTPUT
+          else
+            echo "Could not determine dynamic Go version. Using default: ${{ env.DEFAULT_GO_VERSION }}"
+            echo "GO_VERSION=${{ env.DEFAULT_GO_VERSION }}" >> $GITHUB_ENV
+            echo "go_version=${{ env.DEFAULT_GO_VERSION }}" >> $GITHUB_OUTPUT
+          fi
+
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -62,6 +86,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+
+# --- MODIFIED STEP ---
+      # We add the 'build-args' to pass the version to Docker
       - name: Build and Push Docker Image
         id: build
         uses: docker/build-push-action@v5
@@ -70,6 +97,8 @@ jobs:
           file: ./caddy.Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
+          build-args: |
+            GO_VERSION=${{ env.GO_VERSION }}
           tags: |
             ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
             ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.CADDY_VERSION }}
