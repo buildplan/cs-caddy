@@ -74,7 +74,7 @@ docker exec crowdsec cscli collections install crowdsecurity/appsec-generic-rule
 docker exec crowdsec cscli parsers install crowdsecurity/caddy-logs
 docker exec crowdsec cscli collections install crowdsecurity/caddy
 ```
-Create an AppSec acquisition file: This file tells CrowdSec to activate the AppSec engine. Create a file named appsec.yaml inside the local directory that you mount to /etc/crowdsec in your container. For example, if you mount ./crowdsec/config:/etc/crowdsec, then create the file at `./crowdsec/config/acquis.d/appsec.yaml.acquis.d/appsec.yaml`:
+Create an AppSec acquisition file: This file tells CrowdSec to activate the AppSec engine. Create a file named appsec.yaml inside the local directory that you mount to /etc/crowdsec in your container. For example, if you mount ./crowdsec/config:/etc/crowdsec, then create the file at `./crowdsec/config/acquis.d/appsec.yaml`:
 
 ```bash
 listen_addr: 0.0.0.0:7422
