@@ -52,16 +52,29 @@ services:
 
 # ... other services and network definitions ...
 ```
-Step 2: Get a Bouncer API KeyYour Caddy bouncer needs a key to talk to the CrowdSec agent. Generate one by running:docker compose exec `crowdsec cscli bouncers add caddy-bouncer`
+
+> Make sure to create required directories and an empty log file like:
+
+```bash
+mkdir -p ./caddy/logs
+touch ./caddy/logs/access.log
+chmod 666 ./caddy/logs/access.log
+```
+
+Step 2: Get a Bouncer API KeyYour Caddy bouncer needs a key to talk to the CrowdSec agent. Generate one by running:  
+`docker compose exec crowdsec cscli bouncers add caddy-bouncer`
+
 Copy the API key that it gives you.
 
 Step 3: Enable AppSec in CrowdSecFor the WAF to work, you need to tell your CrowdSec agent to enable the AppSec component.Install the AppSec rule collections:
-```
+
+```bash
 docker compose exec crowdsec cscli collections install crowdsecurity/appsec-virtual-patching
 docker compose exec crowdsec cscli collections install crowdsecurity/appsec-generic-rules
 ```
 Create an AppSec acquisition file: This file tells CrowdSec to activate the AppSec engine. Create a file named appsec.yaml inside the local directory that you mount to /etc/crowdsec in your container. For example, if you mount ./crowdsec/config:/etc/crowdsec, then create the file at `./crowdsec/config/acquis.d/appsec.yaml.acquis.d/appsec.yaml`:
-```
+
+```bash
 listen_addr: 0.0.0.0:7422
 appsec_config: crowdsecurity/appsec-default
 name: caddy-appsec-listener
@@ -72,7 +85,7 @@ labels:
 
 Step 4: Configure Your CaddyfileNow, edit your Caddyfile to use the bouncer.Add the main crowdsec configuration to your global options block at the top.Add the crowdsec and appsec directives inside a route block for every site you want to protect.Here is an example:
 
-```
+```Caddyfile
 # Caddyfile
 
 # --- Global Options ---
@@ -112,12 +125,12 @@ your-domain.com {
 Step 5: Restart and VerifyYou're all set. Restart your entire stack to apply all the changes:docker compose up -d --force-recreate
 To check that everything is working, run docker compose exec crowdsec cscli metrics. You should see a table named "Appsec Metrics", which confirms the WAF is active and processing requests.Included UtilitiesWhen Caddy is built with this module, a new caddy crowdsec command is available. This is useful for checking the status of your integration directly.$ docker compose exec caddy caddy crowdsec
 
-```
+```bash
 # Example: check if an IP is banned
 $ docker compose exec caddy caddy crowdsec check 1.2.3.4
 ```
 
-```
+```bash
 # options below are taken from https://github.com/hslatman/caddy-crowdsec-bouncer
 $ docker exec caddy crowdsec ...
 
