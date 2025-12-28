@@ -69,8 +69,10 @@ Copy the API key that it gives you.
 Step 3: Enable AppSec in CrowdSecFor the WAF to work, you need to tell your CrowdSec agent to enable the AppSec component.Install the AppSec rule collections:
 
 ```bash
-docker compose exec crowdsec cscli collections install crowdsecurity/appsec-virtual-patching
-docker compose exec crowdsec cscli collections install crowdsecurity/appsec-generic-rules
+docker exec crowdsec cscli collections install crowdsecurity/appsec-virtual-patching
+docker exec crowdsec cscli collections install crowdsecurity/appsec-generic-rules
+docker exec crowdsec cscli parsers install crowdsecurity/caddy-logs
+docker exec crowdsec cscli collections install crowdsecurity/caddy
 ```
 Create an AppSec acquisition file: This file tells CrowdSec to activate the AppSec engine. Create a file named appsec.yaml inside the local directory that you mount to /etc/crowdsec in your container. For example, if you mount ./crowdsec/config:/etc/crowdsec, then create the file at `./crowdsec/config/acquis.d/appsec.yaml.acquis.d/appsec.yaml`:
 
