@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Fetch Latest Caddy Version
         id: caddy
@@ -91,7 +91,7 @@ jobs:
       # We add the 'build-args' to pass the version to Docker
       - name: Build and Push Docker Image
         id: build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./caddy.Dockerfile
@@ -115,7 +115,7 @@ jobs:
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
       - name: Dispatch build completion event
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           event-type: caddy-image-built
