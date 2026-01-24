@@ -111,15 +111,32 @@ Step 4: Configure Your CaddyfileNow, edit your Caddyfile to use the bouncer.Add 
 }
 
 # --- Example Site ---
-your-domain.com {
-    # Use a route block to control the order of directives
+stats.mydomain.test {
+  # Create per app/service log file
+	log {
+		output file /var/log/caddy/grafana-access.log {
+			mode 0640
+			roll_size 5MiB
+			roll_keep 3
+			roll_keep_for 180h
+		}
+		format json
+	}
+
 	route {
-        # Security directives should come first
 		crowdsec
 		appsec
 
-        # Your other directives, like reverse_proxy
-		reverse_proxy your-app-container:8000
+		header {
+			Strict-Transport-Security "max-age=31536000; includeSubDomains"
+			X-Frame-Options "SAMEORIGIN"
+			X-Content-Type-Options "nosniff"
+			X-XSS-Protection "0"
+			Referrer-Policy "strict-origin-when-cross-origin"
+			Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		}
+
+		reverse_proxy http://grafana:3000
 	}
 }
 ```
