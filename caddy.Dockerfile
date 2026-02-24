@@ -1,5 +1,5 @@
 # Stage 1: Build custom Caddy with CrowdSec bouncer
-ARG GO_VERSION=1.25
+ARG GO_VERSION=1.26
 FROM golang:${GO_VERSION}-alpine AS builder
 
 RUN apk add --no-cache git
