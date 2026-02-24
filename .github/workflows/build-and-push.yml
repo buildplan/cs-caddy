@@ -51,11 +51,7 @@ jobs:
         run: |
           GO_VERSION_URL="https://raw.githubusercontent.com/caddyserver/caddy/${{ env.CADDY_TAG }}/go.mod"
           echo "Attempting to fetch Go version from: ${GO_VERSION_URL}"
-          
-          # Use curl to fetch, grep to find the line 'go X.YY', awk to get the version
-          # The '|| true' ensures the step doesn't fail if curl, grep, or awk fails
-          DYNAMIC_GO_VERSION=$(curl -sL --fail "${GO_VERSION_URL}" | grep -E "^go [0-9]+\.[0-9]+" | awk '{print $2}' || true)
-          
+          DYNAMIC_GO_VERSION=$(curl -sL --fail "${GO_VERSION_URL}" | grep -oP "^go \K[0-9]+\.[0-9]+" || true)
           if [[ -n "${DYNAMIC_GO_VERSION}" ]]; then
             echo "Successfully found dynamic Go version: ${DYNAMIC_GO_VERSION}"
             echo "GO_VERSION=${DYNAMIC_GO_VERSION}" >> $GITHUB_ENV
