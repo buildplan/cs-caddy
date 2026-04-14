@@ -118,7 +118,7 @@ jobs:
           client-payload: '{"image_tag": "${{ env.CADDY_VERSION }}-bouncer-${{ env.BOUNCER_VERSION }}"}'
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: cs-caddy-${{ env.CADDY_VERSION }}-bouncer-${{ env.BOUNCER_VERSION }}
           name: "CS-Caddy ${{ env.CADDY_VERSION }} + Bouncer ${{ env.BOUNCER_VERSION }}"
