@@ -1,12 +1,9 @@
 name: Build and Push CS-Caddy to GHCR and Docker Hub
 
 on:
-  # triggered by events, not its own schedule.
   repository_dispatch:
     types: [caddy-release, bouncer-release]
-
   workflow_dispatch:
-
   push:
     branches:
       - 'main'
@@ -17,6 +14,7 @@ on:
 permissions:
   contents: write
   packages: write
+  security-events: write
 
 jobs:
   build-and-push:
@@ -82,9 +80,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-
-# --- MODIFIED STEP ---
-      # We add the 'build-args' to pass the version to Docker
       - name: Build and Push Docker Image
         id: build
         uses: docker/build-push-action@v7
@@ -109,6 +104,29 @@ jobs:
             org.opencontainers.image.description=Custom Caddy image with CrowdSec bouncer modules
             org.opencontainers.image.version=${{ env.CADDY_VERSION }}-bouncer-${{ env.BOUNCER_VERSION }}
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: 'ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.CADDY_VERSION }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          # exit-code: '1' # Uncomment this line for GitHub Action to FAIL when CRITICAL/HIGH vulns are found. By default, it just reports them.
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run Trivy to submit SBOM to Dependency Graph
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: 'ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.CADDY_VERSION }}'
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          github-pat: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Dispatch build completion event
         uses: peter-evans/repository-dispatch@v4
