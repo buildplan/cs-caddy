@@ -1,6 +1,8 @@
 # Stage 1: Build custom Caddy with CrowdSec bouncer
 ARG GO_VERSION=1.26
-FROM golang:${GO_VERSION}-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS builder
+ARG TARGETOS
+ARG TARGETARCH
 
 RUN apk add --no-cache git
 
@@ -24,11 +26,14 @@ func main() {
 }
 EOF
 
-# Initialize a Go module and download all the necessary dependencies
-RUN go mod init custom-caddy && go mod tidy
+# # Initialize a Go module and download all the necessary dependencies & Mount a cache
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod init custom-caddy && go mod tidy
 
 # Build CS-Caddy binary
-RUN CGO_ENABLED=0 GOOS=linux go build \
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -o /usr/bin/caddy \
     -ldflags "-w -s" .
 
