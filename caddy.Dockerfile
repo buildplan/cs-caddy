@@ -26,9 +26,21 @@ func main() {
 }
 EOF
 
-# # Initialize a Go module and download all the necessary dependencies & Mount a cache
+# Initialize the Go module
 RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod init custom-caddy && go mod tidy
+    go mod init custom-caddy
+
+# Update the vulnerable GO modules flagged by Trivy/Dependabot scans
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go get google.golang.org/grpc@latest \
+    github.com/jackc/pgx/v5@latest \
+    github.com/smallstep/certificates@latest \
+    github.com/go-jose/go-jose/v3@latest \
+    github.com/go-jose/go-jose/v4@latest \
+    go.opentelemetry.io/otel@latest
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod tidy
 
 # Build CS-Caddy binary
 RUN --mount=type=cache,target=/go/pkg/mod \
