@@ -41,7 +41,13 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go.opentelemetry.io/otel/sdk@latest \
     go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp@latest \
     go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp@latest \
-    go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp@latest
+    go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp@latest \
+    go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc@latest \
+    go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc@latest \
+    go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc@latest \
+    go.opentelemetry.io/otel/exporters/stdout/stdoutlog@latest \
+    go.opentelemetry.io/otel/exporters/stdout/stdoutmetric@latest \
+    go.opentelemetry.io/otel/exporters/stdout/stdouttrace@latest
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod tidy
