@@ -1,5 +1,6 @@
 # Stage 1: Build custom Caddy with CrowdSec bouncer
-ARG GO_VERSION=1.26
+ARG GO_VERSION=1.27
+ARG CADDY_VERSION=latest
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS builder
 ARG TARGETOS
 ARG TARGETARCH
@@ -49,7 +50,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     -ldflags "-w -s" .
 
 # Final stage: Use upstream Caddy base image
-FROM caddy:latest
+ARG CADDY_VERSION
+FROM caddy:${CADDY_VERSION}-alpine
 
 # Copy CS-Caddy binary from the builder stage
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
