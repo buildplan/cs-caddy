@@ -1,6 +1,6 @@
 # Stage 1: Build custom Caddy with CrowdSec bouncer
 ARG GO_VERSION=1.27
-ARG CADDY_VERSION=latest
+ARG CADDY_VERSION=2
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS builder
 ARG TARGETOS
 ARG TARGETARCH
